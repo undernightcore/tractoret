@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Group {
+  id             Int    @id @default(autoincrement())
+  name           String @unique
+  color          String
+  interval       Int
+  workers        Int
+  stockIfPresent String
+  priceLocator   String
+  links          Link[]
+}
+
+model Link {
+  id          Int      @id @default(autoincrement())
+  name        String
+  url         String
+  last        String
+  lastPrice   String
+  lastStock   Boolean
+  lastChecked DateTime
+  lastChanged DateTime
+  group       Group    @relation(fields: [groupId], references: [id])
+  groupId     Int
+}
