@@ -3,10 +3,15 @@ import { notFoundHandler } from "./handlers/404";
 import { errorHandler } from "./handlers/error";
 import { httpErrorHandler } from "./handlers/http";
 import { zodErrorHandler } from "./handlers/zod";
+import { groupRouter } from "./routes/group";
+import { linkRouter } from "./routes/link";
 
 const app = express();
 
 app.use(json());
+
+app.use("/groups", groupRouter);
+app.use("/groups/:groupId/links", linkRouter);
 
 app.use(notFoundHandler);
 app.use(zodErrorHandler);

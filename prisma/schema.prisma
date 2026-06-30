@@ -24,9 +24,10 @@ model Link {
   url         String
   last        String
   lastPrice   String
+  lastError   String?
   lastStock   Boolean
-  lastChecked DateTime
-  lastChanged DateTime
+  lastChecked DateTime @default(now())
+  lastChanged DateTime @default(now())
   group       Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId     Int
 }

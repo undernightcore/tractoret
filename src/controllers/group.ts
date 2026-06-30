@@ -9,7 +9,7 @@ export const getGroups: RequestHandler = async (req, res) => {
   const { direction, orderBy, search } = filterValidator.parse(req.body);
   const { page, pageSize } = paginationValidator.parse(req.body);
 
-  const [routes, total] = await prisma.$transaction([
+  const [groups, total] = await prisma.$transaction([
     prisma.group.findMany({
       where: { name: { contains: search } },
       orderBy: orderBy && direction ? { [orderBy]: direction } : undefined,
@@ -21,7 +21,16 @@ export const getGroups: RequestHandler = async (req, res) => {
     }),
   ]);
 
-  return res.status(200).json({ routes, total });
+  return res.status(200).json({ groups, total });
+};
+
+export const getGroup: RequestHandler = async (req, res) => {
+  const group = await prisma.group.findUnique({
+    where: { id: Number(req.params.groupId) },
+  });
+  if (!group) throw new HttpError(404, "Group not found");
+
+  return res.status(200).json(group);
 };
 
 export const createGroup: RequestHandler = async (req, res) => {
@@ -52,9 +61,12 @@ export const editGroup: RequestHandler = async (req, res) => {
   if (conflicting)
     throw new HttpError(409, "There is already a group with that name");
 
-  const created = await prisma.group.create({ data });
+  const updated = await prisma.group.update({
+    where: { id: existing.id },
+    data,
+  });
 
-  return res.status(200).json(created);
+  return res.status(200).json(updated);
 };
 
 export const deleteGroup: RequestHandler = async (req, res) => {
@@ -64,4 +76,8 @@ export const deleteGroup: RequestHandler = async (req, res) => {
   if (!existing) throw new HttpError(404, "Group not found");
 
   await prisma.group.delete({ where: { id: existing.id } });
+
+  return res
+    .status(200)
+    .json({ message: "Group and links deleted succesfully" });
 };
